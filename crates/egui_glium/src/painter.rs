@@ -112,14 +112,17 @@ impl Painter {
         self.max_texture_side
     }
 
-    pub fn paint_and_update_textures<T: glium::Surface>(
+    pub fn paint_and_update_textures<S, T: glium::Surface>(
         &mut self,
-        display: &glium::Display,
+        display: &glium::Display<S>,
         target: &mut T,
         pixels_per_point: f32,
         clipped_primitives: &[egui::ClippedPrimitive],
         textures_delta: &egui::TexturesDelta,
-    ) {
+    )
+    where
+        S: glium::glutin::surface::SurfaceTypeTrait + glium::glutin::surface::ResizeableSurface,
+    {
         for (id, image_delta) in &textures_delta.set {
             self.set_texture(display, *id, image_delta);
         }
@@ -134,13 +137,16 @@ impl Painter {
     /// Main entry-point for painting a frame.
     /// You should call `target.clear_color(..)` before
     /// and `target.finish()` after this.
-    pub fn paint_primitives<T: glium::Surface>(
+    pub fn paint_primitives<S, T: glium::Surface>(
         &mut self,
-        display: &glium::Display,
+        display: &glium::Display<S>,
         target: &mut T,
         pixels_per_point: f32,
         clipped_primitives: &[egui::ClippedPrimitive],
-    ) {
+    )
+    where
+        S: glium::glutin::surface::SurfaceTypeTrait + glium::glutin::surface::ResizeableSurface,
+    {
         for egui::ClippedPrimitive {
             clip_rect,
             primitive,
@@ -158,14 +164,17 @@ impl Painter {
     }
 
     #[inline(never)] // Easier profiling
-    fn paint_mesh<T: glium::Surface>(
+    fn paint_mesh<S, T: glium::Surface>(
         &mut self,
         target: &mut T,
-        display: &glium::Display,
+        display: &glium::Display<S>,
         pixels_per_point: f32,
         clip_rect: &Rect,
         mesh: &Mesh,
-    ) {
+    )
+    where
+        S: glium::glutin::surface::SurfaceTypeTrait + glium::glutin::surface::ResizeableSurface,
+    {
         debug_assert!(mesh.is_valid());
 
         let vertex_buffer = {
